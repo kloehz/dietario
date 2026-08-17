@@ -60,7 +60,7 @@ class _MemoryStore implements LocalStore {
   ]) async {
     final lower = sql.toLowerCase();
     final m = RegExp(r'from\s+(\w+)').firstMatch(lower);
-    if (lower.contains('max(coalesce(max(order_index)') && m != null) {
+    if (m != null && lower.contains('max(order_index)')) {
       final table = m.group(1)!;
       _ensure(table);
       var max = -1;
@@ -69,6 +69,19 @@ class _MemoryStore implements LocalStore {
         if (oi is int && oi > max) max = oi;
       }
       return [{'m': max}];
+    }
+    if (m != null && lower.contains('count(*)')) {
+      final table = m.group(1)!;
+      _ensure(table);
+      final rows = _tables[table]!;
+      final purchased = lower.contains("status = 'comprado'");
+      return [
+        {
+          'c': purchased
+              ? rows.where((row) => row['status'] == 'comprado').length
+              : rows.length,
+        }
+      ];
     }
     return [];
   }
