@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../controllers/auth_controller.dart';
 import '../controllers/household_controller.dart';
 
 /// Small icon button that opens a bottom sheet with the current household
@@ -97,7 +98,7 @@ class _HouseholdSheet extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await context.read<HouseholdController>().signOut();
+                await context.read<AuthController>().signOut();
               },
               icon: const Icon(Icons.logout),
               label: const Text('Cerrar sesión'),

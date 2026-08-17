@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../controllers/auth_controller.dart';
 import '../../controllers/household_controller.dart';
 
 class HouseholdSetupPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class _HouseholdSetupPageState extends State<HouseholdSetupPage> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
-            onPressed: () => context.read<HouseholdController>().signOut(),
+            onPressed: () => context.read<AuthController>().signOut(),
           ),
         ],
       ),
