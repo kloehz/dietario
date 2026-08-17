@@ -34,6 +34,7 @@ import 'presentation/pages/notes_page.dart';
 import 'presentation/pages/prep_page.dart';
 import 'presentation/pages/recipes_page.dart';
 import 'presentation/pages/shopping_page.dart';
+import 'presentation/widgets/fab_scope.dart';
 
 class DietarioApp extends StatefulWidget {
   const DietarioApp({super.key});
@@ -199,6 +200,7 @@ class _DietarioAppState extends State<DietarioApp> {
             loc.notesInterface as NotesRepositoryImpl,
           )..load(),
         ),
+        ChangeNotifierProvider(create: (_) => FabController()),
       ],
       child: _WireSync(
         child: MaterialApp.router(

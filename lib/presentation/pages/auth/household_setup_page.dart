@@ -15,15 +15,6 @@ class HouseholdSetupPage extends StatefulWidget {
 
 class _HouseholdSetupPageState extends State<HouseholdSetupPage> {
   @override
-  void initState() {
-    super.initState();
-    // In case the controller hasn't loaded yet (deep link back into this page).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<HouseholdController>().load();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     return Scaffold(

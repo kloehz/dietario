@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/fab_scope.dart';
 import '../widgets/household_info_button.dart';
@@ -25,17 +26,19 @@ class HomeShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
-    final fab = FabActionScope.of(context);
+    final fab = context.watch<FabController>().action;
     return Scaffold(
       body: SafeArea(bottom: false, child: child),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: fab.onAdd,
-        icon: Icon(fab.icon),
-        label: Text(fab.label),
-        backgroundColor: t.colorScheme.primary,
-        foregroundColor: t.colorScheme.onPrimary,
-        elevation: 4,
-      ),
+      floatingActionButton: fab == null
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: fab.onAdd,
+              icon: Icon(fab.icon),
+              label: Text(fab.label),
+              backgroundColor: t.colorScheme.primary,
+              foregroundColor: t.colorScheme.onPrimary,
+              elevation: 4,
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
