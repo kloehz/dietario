@@ -81,7 +81,7 @@ class _DietarioAppState extends State<DietarioApp> {
   GoRouter _buildRouter() {
     return GoRouter(
       initialLocation: '/login',
-      refreshListenable: _auth,
+      refreshListenable: Listenable.merge([_auth, _household]),
       redirect: (context, state) {
         final loc = state.matchedLocation;
         final loggedIn = _auth.status == AuthStatus.signedIn;

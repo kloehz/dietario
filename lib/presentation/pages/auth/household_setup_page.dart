@@ -141,12 +141,15 @@ class _CreateCardState extends State<_CreateCard> {
                   style: TextStyle(color: t.colorScheme.error, fontSize: 12)),
             ],
             const SizedBox(height: 14),
-            FilledButton.icon(
-              onPressed: _busy ? null : _submit,
-              icon: const Icon(Icons.add),
-              label: Text(_busy ? 'Creando...' : 'Crear'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _busy ? null : _submit,
+                icon: const Icon(Icons.add),
+                label: Text(_busy ? 'Creando...' : 'Crear'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
               ),
             ),
           ],
@@ -251,12 +254,15 @@ class _JoinCardState extends State<_JoinCard> {
                   style: TextStyle(color: t.colorScheme.error, fontSize: 12)),
             ],
             const SizedBox(height: 14),
-            FilledButton.icon(
-              onPressed: _busy ? null : _submit,
-              icon: const Icon(Icons.login),
-              label: Text(_busy ? 'Uniéndome...' : 'Unirme'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _busy ? null : _submit,
+                icon: const Icon(Icons.login),
+                label: Text(_busy ? 'Uniéndome...' : 'Unirme'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
               ),
             ),
           ],
