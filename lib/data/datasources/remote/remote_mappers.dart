@@ -71,12 +71,10 @@ class RemoteMappers {
 
 class RemotePayloads {
   static Map<String, dynamic> mealRow({
-    required String remoteId,
     required String householdId,
     required DayMeal m,
   }) =>
       {
-        'id': remoteId,
         'household_id': householdId,
         'day': m.day,
         'slot': m.slot.name,
@@ -87,12 +85,10 @@ class RemotePayloads {
       };
 
   static Map<String, dynamic> shoppingRow({
-    required String remoteId,
     required String householdId,
     required ShoppingItem i,
   }) =>
       {
-        'id': remoteId,
         'household_id': householdId,
         'category': i.category,
         'product': i.product,
@@ -104,12 +100,10 @@ class RemotePayloads {
       };
 
   static Map<String, dynamic> recipeRow({
-    required String remoteId,
     required String householdId,
     required Recipe r,
   }) =>
       {
-        'id': remoteId,
         'household_id': householdId,
         'day': r.day,
         'meal': r.meal,
@@ -121,12 +115,10 @@ class RemotePayloads {
       };
 
   static Map<String, dynamic> prepRow({
-    required String remoteId,
     required String householdId,
     required PrepTask t,
   }) =>
       {
-        'id': remoteId,
         'household_id': householdId,
         'order_index': t.order,
         'task': t.task,
@@ -137,12 +129,10 @@ class RemotePayloads {
       };
 
   static Map<String, dynamic> noteRow({
-    required String remoteId,
     required String householdId,
     required PlanNote n,
   }) =>
       {
-        'id': remoteId,
         'household_id': householdId,
         'topic': n.topic,
         'respected': n.respected,

@@ -70,7 +70,6 @@ class RemoteSyncSource {
     final id = await _c
         .from('day_meals')
         .insert(RemotePayloads.mealRow(
-          remoteId: '',
           householdId: householdId,
           m: m,
         ))
@@ -83,7 +82,6 @@ class RemoteSyncSource {
     final id = await _c
         .from('shopping_items')
         .insert(RemotePayloads.shoppingRow(
-          remoteId: '',
           householdId: householdId,
           i: i,
         ))
@@ -96,7 +94,6 @@ class RemoteSyncSource {
     final id = await _c
         .from('recipes')
         .insert(RemotePayloads.recipeRow(
-          remoteId: '',
           householdId: householdId,
           r: r,
         ))
@@ -109,7 +106,6 @@ class RemoteSyncSource {
     final id = await _c
         .from('prep_tasks')
         .insert(RemotePayloads.prepRow(
-          remoteId: '',
           householdId: householdId,
           t: t,
         ))
@@ -122,7 +118,6 @@ class RemoteSyncSource {
     final id = await _c
         .from('plan_notes')
         .insert(RemotePayloads.noteRow(
-          remoteId: '',
           householdId: householdId,
           n: n,
         ))
