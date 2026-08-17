@@ -38,7 +38,8 @@ class _SignupPageState extends State<SignupPage> {
             password: _passCtrl.text,
           );
       if (mounted) context.go('/household');
-    } on Exception catch (e) {
+    } catch (e, st) {
+      debugPrint('[auth] sign-up failed: $e\n$st');
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);

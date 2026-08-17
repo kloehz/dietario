@@ -100,7 +100,8 @@ class _CreateCardState extends State<_CreateCard> {
     try {
       await context.read<HouseholdController>().create(name: name);
       if (mounted) context.go('/menu');
-    } on Exception catch (e) {
+    } catch (e, st) {
+      debugPrint('[auth] create household failed: $e\n$st');
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -195,7 +196,8 @@ class _JoinCardState extends State<_JoinCard> {
       if (mounted) context.go('/menu');
     } on FormatException {
       setState(() => _error = 'Código inválido. Pedile el código a tu pareja.');
-    } on Exception catch (e) {
+    } catch (e, st) {
+      debugPrint('[auth] join failed: $e\n$st');
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _busy = false);

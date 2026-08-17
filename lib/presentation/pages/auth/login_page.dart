@@ -38,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
             password: _passCtrl.text,
           );
       if (mounted) context.go('/household');
-    } on Exception catch (e) {
+    } catch (e, st) {
+      debugPrint('[auth] sign-in failed: $e\n$st');
       setState(() => _error = _humanize(e));
     } finally {
       if (mounted) setState(() => _loading = false);

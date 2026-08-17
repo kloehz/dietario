@@ -31,7 +31,8 @@ class HouseholdController extends ChangeNotifier {
       } else {
         await _sync.disconnect();
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('[household] load failed: $e\n$st');
       _error = e.toString();
     } finally {
       _loading = false;
@@ -42,16 +43,26 @@ class HouseholdController extends ChangeNotifier {
   Future<Household> create({required String name}) async {
     final h = await _service.create(name: name);
     _current = h;
-    await _sync.connect(h.id);
     notifyListeners();
+    try {
+      await _sync.connect(h.id);
+    } catch (e, st) {
+      // Sync errors shouldn't block household creation — the user can
+      // still see their plan, just without realtime updates.
+      debugPrint('[household] sync connect failed: $e\n$st');
+    }
     return h;
   }
 
   Future<Household> joinByCode({required String code}) async {
     final h = await _service.joinByCode(code: code);
     _current = h;
-    await _sync.connect(h.id);
     notifyListeners();
+    try {
+      await _sync.connect(h.id);
+    } catch (e, st) {
+      debugPrint('[household] sync connect failed: $e\n$st');
+    }
     return h;
   }
 
