@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 import 'seed_data.dart';
 
@@ -9,14 +11,31 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   Database? _db;
+  bool _factoryConfigured = false;
 
   Future<Database> get database async {
     if (_db != null) return _db!;
+    if (!_factoryConfigured) {
+      if (kIsWeb) {
+        databaseFactory = databaseFactoryFfiWeb;
+      }
+      _factoryConfigured = true;
+    }
     _db = await _open();
     return _db!;
   }
 
   Future<Database> _open() async {
+    if (kIsWeb) {
+      return databaseFactory.openDatabase(
+        'dietario.db',
+        options: OpenDatabaseOptions(
+          version: 2,
+          onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
+        ),
+      );
+    }
     final dir = await getApplicationDocumentsDirectory();
     final path = p.join(dir.path, 'dietario.db');
     return openDatabase(
