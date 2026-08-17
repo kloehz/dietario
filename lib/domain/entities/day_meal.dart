@@ -26,6 +26,7 @@ class DayMeal {
   final String? menuCode;  // MENÚ 1, MENÚ 2, ...
   final String? note;
   final int orderIndex;
+  final String? remoteId;  // UUID assigned when synced to Supabase.
 
   const DayMeal({
     required this.id,
@@ -35,9 +36,15 @@ class DayMeal {
     this.menuCode,
     this.note,
     required this.orderIndex,
+    this.remoteId,
   });
 
-  DayMeal copyWith({String? text, String? menuCode, String? note}) =>
+  DayMeal copyWith({
+    String? text,
+    String? menuCode,
+    String? note,
+    String? remoteId,
+  }) =>
       DayMeal(
         id: id,
         day: day,
@@ -46,5 +53,6 @@ class DayMeal {
         menuCode: menuCode ?? this.menuCode,
         note: note ?? this.note,
         orderIndex: orderIndex,
+        remoteId: remoteId ?? this.remoteId,
       );
 }

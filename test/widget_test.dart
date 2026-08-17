@@ -28,7 +28,9 @@ class _FakeMenuRepo implements MenuRepository {
     String? menuCode,
     String? note,
   }) async {
-    final id = meals.isEmpty ? 1 : meals.map((m) => m.id).reduce((a, b) => a > b ? a : b) + 1;
+    final id = meals.isEmpty
+        ? 1
+        : meals.map((m) => m.id).reduce((a, b) => a > b ? a : b) + 1;
     final m = DayMeal(
       id: id,
       day: day,
@@ -63,7 +65,9 @@ class _FakeShoppingRepo implements ShoppingRepository {
     required String unit,
     required String notes,
   }) async {
-    final id = items.isEmpty ? 1 : items.map((i) => i.id).reduce((a, b) => a > b ? a : b) + 1;
+    final id = items.isEmpty
+        ? 1
+        : items.map((i) => i.id).reduce((a, b) => a > b ? a : b) + 1;
     final i = ShoppingItem(
       id: id,
       category: category,
@@ -111,7 +115,9 @@ class _FakeRecipeRepo implements RecipeRepository {
     required String preparation,
     required String origin,
   }) async {
-    final id = recipes.isEmpty ? 1 : recipes.map((r) => r.id).reduce((a, b) => a > b ? a : b) + 1;
+    final id = recipes.isEmpty
+        ? 1
+        : recipes.map((r) => r.id).reduce((a, b) => a > b ? a : b) + 1;
     final r = Recipe(
       id: id,
       day: day,
@@ -147,7 +153,9 @@ class _FakePrepRepo implements PrepRepository {
     required String purpose,
     required String storage,
   }) async {
-    final id = tasks.isEmpty ? 1 : tasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1;
+    final id = tasks.isEmpty
+        ? 1
+        : tasks.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1;
     final t = PrepTask(
       id: id,
       order: order == 0 ? (tasks.length + 1) : order,
@@ -258,7 +266,8 @@ void main() {
     });
 
     test('toggleStatus flips state and add appends', () async {
-      final repo = _FakeShoppingRepo([_item(1, 'Verdulería', ShoppingStatus.pendiente)]);
+      final repo = _FakeShoppingRepo(
+          [_item(1, 'Verdulería', ShoppingStatus.pendiente)]);
       final c = ShoppingController(repo);
       await c.load();
       await c.toggleStatus(c.items.first);
@@ -301,7 +310,7 @@ void main() {
         origin: '',
       );
       expect(c.recipes.length, 2);
-      expect(c.filter, isNull); // cleared because new day != filter
+      expect(c.filter, isNull);
     });
   });
 

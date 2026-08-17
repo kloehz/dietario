@@ -7,6 +7,7 @@ class Recipe {
   final String preparation;
   final String origin;
   final int orderIndex;
+  final String? remoteId;
 
   const Recipe({
     required this.id,
@@ -17,6 +18,7 @@ class Recipe {
     required this.preparation,
     required this.origin,
     required this.orderIndex,
+    this.remoteId,
   });
 
   Recipe copyWith({
@@ -24,6 +26,7 @@ class Recipe {
     String? ingredients,
     String? preparation,
     String? origin,
+    String? remoteId,
   }) =>
       Recipe(
         id: id,
@@ -34,5 +37,6 @@ class Recipe {
         preparation: preparation ?? this.preparation,
         origin: origin ?? this.origin,
         orderIndex: orderIndex,
+        remoteId: remoteId ?? this.remoteId,
       );
 }

@@ -22,6 +22,7 @@ class PrepTask {
   final String purpose;
   final String storage;
   final PrepStatus status;
+  final String? remoteId;
 
   const PrepTask({
     required this.id,
@@ -31,9 +32,10 @@ class PrepTask {
     required this.purpose,
     required this.storage,
     required this.status,
+    this.remoteId,
   });
 
-  PrepTask copyWith({PrepStatus? status}) => PrepTask(
+  PrepTask copyWith({PrepStatus? status, String? remoteId}) => PrepTask(
         id: id,
         order: order,
         task: task,
@@ -41,5 +43,6 @@ class PrepTask {
         purpose: purpose,
         storage: storage,
         status: status ?? this.status,
+        remoteId: remoteId ?? this.remoteId,
       );
 }

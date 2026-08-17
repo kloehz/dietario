@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../widgets/fab_scope.dart';
+import '../widgets/household_info_button.dart';
 import '../widgets/section_header.dart';
 
 class HomeShellPage extends StatelessWidget {
@@ -76,6 +77,7 @@ class PageScaffold extends StatelessWidget {
   final List<Widget> actions;
   final Widget? banner;
   final Widget? progress;
+  final bool showHouseholdButton;
 
   const PageScaffold({
     super.key,
@@ -85,6 +87,7 @@ class PageScaffold extends StatelessWidget {
     this.actions = const [],
     this.banner,
     this.progress,
+    this.showHouseholdButton = true,
   });
 
   @override
@@ -95,9 +98,13 @@ class PageScaffold extends StatelessWidget {
         SectionHeader(
           title: title,
           subtitle: subtitle,
-          trailing: actions.isEmpty
-              ? null
-              : Row(mainAxisSize: MainAxisSize.min, children: actions),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...actions,
+              if (showHouseholdButton) const HouseholdInfoButton(),
+            ],
+          ),
         ),
         ?banner,
         ?progress,

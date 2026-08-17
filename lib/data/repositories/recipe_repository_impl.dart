@@ -1,11 +1,20 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../domain/entities/recipe.dart';
 import '../../../domain/repositories/recipe_repository.dart';
 import '../datasources/local/app_database.dart';
+import '../datasources/remote/remote_mappers.dart';
+import '../datasources/remote/remote_sync_source.dart';
 import '../models/recipe_model.dart';
 
 class RecipeRepositoryImpl implements RecipeRepository {
   final AppDatabase _db;
+  RemoteSyncSource? _remote;
   RecipeRepositoryImpl(this._db);
+
+  void bindRemote(RemoteSyncSource? remote) {
+    _remote = remote;
+  }
 
   @override
   Future<List<Recipe>> getAll() async {
@@ -49,7 +58,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
       'origin': origin,
       'order_index': nextOrder,
     });
-    return Recipe(
+    var r = Recipe(
       id: id,
       day: day,
       meal: meal,
@@ -59,6 +68,13 @@ class RecipeRepositoryImpl implements RecipeRepository {
       origin: origin,
       orderIndex: nextOrder,
     );
+    final remote = _remote;
+    if (remote != null) {
+      final remoteId = await remote.insertRecipe(r);
+      await _db.setRemoteId('recipes', id, remoteId);
+      r = r.copyWith(remoteId: remoteId);
+    }
+    return r;
   }
 
   @override
@@ -75,11 +91,54 @@ class RecipeRepositoryImpl implements RecipeRepository {
       where: 'id = ?',
       whereArgs: [recipe.id],
     );
+    final remote = _remote;
+    final remoteId = recipe.remoteId;
+    if (remote != null && remoteId != null) {
+      await remote.updateRecipe(remoteId, recipe);
+    }
   }
 
   @override
   Future<void> delete(int id) async {
     final db = await _db.database;
+    final row = await db.query(
+      'recipes',
+      columns: ['remote_id'],
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
     await db.delete('recipes', where: 'id = ?', whereArgs: [id]);
+    final remote = _remote;
+    final remoteId =
+        row.isNotEmpty ? row.first['remote_id'] as String? : null;
+    if (remote != null && remoteId != null) {
+      await remote.deleteRecipe(remoteId);
+    }
+  }
+
+  Future<void> syncPull() async {
+    final remote = _remote;
+    if (remote == null) return;
+    final items = await remote.fetchRecipes();
+    final rows = items
+        .map((r) => {...RecipeMapper.toRow(r), 'remote_id': r.remoteId})
+        .toList();
+    await _db.replaceAll('recipes', rows);
+  }
+
+  Future<void> applyRemoteChange(RemoteChange change) async {
+    if (change.type != RemoteEntityType.recipe) return;
+    if (change.event == PostgresChangeEvent.delete) {
+      await _db.deleteByRemoteId('recipes', change.remoteId);
+      return;
+    }
+    final row = change.newRow;
+    if (row == null) return;
+    final r = RemoteMappers.recipe(row);
+    await _db.upsertByRemoteId(
+      'recipes',
+      {...RecipeMapper.toRow(r), 'remote_id': change.remoteId},
+    );
   }
 }

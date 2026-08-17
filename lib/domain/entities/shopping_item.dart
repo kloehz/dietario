@@ -23,6 +23,7 @@ class ShoppingItem {
   final String notes;
   final ShoppingStatus status;
   final int orderIndex;
+  final String? remoteId;
 
   const ShoppingItem({
     required this.id,
@@ -33,6 +34,7 @@ class ShoppingItem {
     required this.notes,
     required this.status,
     required this.orderIndex,
+    this.remoteId,
   });
 
   ShoppingItem copyWith({
@@ -42,6 +44,7 @@ class ShoppingItem {
     String? unit,
     String? notes,
     ShoppingStatus? status,
+    String? remoteId,
   }) =>
       ShoppingItem(
         id: id,
@@ -52,5 +55,6 @@ class ShoppingItem {
         notes: notes ?? this.notes,
         status: status ?? this.status,
         orderIndex: orderIndex,
+        remoteId: remoteId ?? this.remoteId,
       );
 }

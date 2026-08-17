@@ -8,5 +8,15 @@ class PlanNoteMapper {
         applied: m['applied'] as String,
         source: m['source'] as String,
         orderIndex: m['order_index'] as int,
+        remoteId: m['remote_id'] as String?,
       );
+
+  static Map<String, Object?> toRow(PlanNote n) => {
+        'topic': n.topic,
+        'respected': n.respected,
+        'applied': n.applied,
+        'source': n.source,
+        'order_index': n.orderIndex,
+        'remote_id': n.remoteId,
+      };
 }

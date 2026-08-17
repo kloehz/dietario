@@ -10,5 +10,17 @@ class ShoppingItemMapper {
         notes: m['notes'] as String,
         status: ShoppingStatusX.fromKey(m['status'] as String),
         orderIndex: m['order_index'] as int,
+        remoteId: m['remote_id'] as String?,
       );
+
+  static Map<String, Object?> toRow(ShoppingItem i) => {
+        'category': i.category,
+        'product': i.product,
+        'quantity': i.quantity,
+        'unit': i.unit,
+        'notes': i.notes,
+        'status': i.status.name,
+        'order_index': i.orderIndex,
+        'remote_id': i.remoteId,
+      };
 }

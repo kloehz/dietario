@@ -9,5 +9,16 @@ class DayMealMapper {
         menuCode: m['menu_code'] as String?,
         note: m['note'] as String?,
         orderIndex: m['order_index'] as int,
+        remoteId: m['remote_id'] as String?,
       );
+
+  static Map<String, Object?> toRow(DayMeal m) => {
+        'day': m.day,
+        'slot': m.slot.name,
+        'text': m.text,
+        'menu_code': m.menuCode,
+        'note': m.note,
+        'order_index': m.orderIndex,
+        'remote_id': m.remoteId,
+      };
 }
