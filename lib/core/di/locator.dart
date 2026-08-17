@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/datasources/local/app_database.dart';
@@ -38,14 +39,18 @@ class AppLocator {
   late final SyncCoordinator sync;
 
   Future<void> bootstrap() async {
+    debugPrint('[locator] supabase init');
     await SupabaseBootstrap.initialize();
+    debugPrint('[locator] shared_preferences');
     prefs = await SharedPreferences.getInstance();
     householdStore = ActiveHouseholdStore(prefs);
     auth = AuthService();
     households = HouseholdService();
+    debugPrint('[locator] opening local DB');
     db = AppDatabase.instance;
-    // Touch the DB so the first read isn't blocked by migration.
-    await db.database;
+    // Touch the store so it opens / seeds before first read.
+    await db.queryAll('day_meals', where: '1=0', whereArgs: []);
+    debugPrint('[locator] DB ready, creating repos');
 
     menuRepo = MenuRepositoryImpl(db);
     shoppingRepo = ShoppingRepositoryImpl(db);
@@ -61,6 +66,7 @@ class AppLocator {
       notes: notesRepo,
       households: households,
     );
+    debugPrint('[locator] bootstrap done');
   }
 
   // Abstract types for use by presentation (controllers). Repos expose

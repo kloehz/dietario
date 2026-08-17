@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'app.dart';
@@ -10,7 +9,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runZonedGuarded(() async {
     try {
+      debugPrint('[boot] step 1: Supabase init');
       await AppLocator.instance.bootstrap();
+      debugPrint('[boot] step 2: runApp DietarioApp');
       runApp(const DietarioApp());
     } catch (e, st) {
       debugPrint('Bootstrap failed: $e\n$st');

@@ -29,10 +29,16 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>dietario</title>
+  <title>Dietario · Plan semanal 2 personas</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!--
+    sqflite_common_ffi_web needs this worker to handle DB queries on the
+    web. Without it, every query throws "unsupported result null".
+  -->
+  <script src="sqflite_sw.js"></script>
+
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

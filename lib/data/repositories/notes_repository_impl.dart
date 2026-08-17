@@ -18,8 +18,7 @@ class NotesRepositoryImpl implements NotesRepository {
 
   @override
   Future<List<PlanNote>> getAll() async {
-    final db = await _db.database;
-    final rows = await db.query('plan_notes', orderBy: 'order_index ASC');
+    final rows = await _db.queryAll('plan_notes', orderBy: 'order_index ASC');
     return rows.map(PlanNoteMapper.fromMap).toList();
   }
 
@@ -30,12 +29,11 @@ class NotesRepositoryImpl implements NotesRepository {
     required String applied,
     required String source,
   }) async {
-    final db = await _db.database;
-    final maxRow = await db.rawQuery(
+    final maxRow = await _db.rawQuery(
       'SELECT COALESCE(MAX(order_index), -1) AS m FROM plan_notes',
     );
     final nextOrder = (maxRow.first['m'] as int) + 1;
-    final id = await db.insert('plan_notes', {
+    final id = await _db.insertRow('plan_notes', {
       'topic': topic,
       'respected': respected,
       'applied': applied,
@@ -61,15 +59,13 @@ class NotesRepositoryImpl implements NotesRepository {
 
   @override
   Future<void> delete(int id) async {
-    final db = await _db.database;
-    final row = await db.query(
+    final row = await _db.queryAll(
       'plan_notes',
-      columns: ['remote_id'],
+      columns: const ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
-    await db.delete('plan_notes', where: 'id = ?', whereArgs: [id]);
+    await _db.deleteWhere('plan_notes', 'id = ?', [id]);
     final remote = _remote;
     final remoteId =
         row.isNotEmpty ? row.first['remote_id'] as String? : null;

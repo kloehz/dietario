@@ -18,15 +18,13 @@ class RecipeRepositoryImpl implements RecipeRepository {
 
   @override
   Future<List<Recipe>> getAll() async {
-    final db = await _db.database;
-    final rows = await db.query('recipes', orderBy: 'order_index ASC');
+    final rows = await _db.queryAll('recipes', orderBy: 'order_index ASC');
     return rows.map(RecipeMapper.fromMap).toList();
   }
 
   @override
   Future<List<Recipe>> getByDay(String day) async {
-    final db = await _db.database;
-    final rows = await db.query(
+    final rows = await _db.queryAll(
       'recipes',
       where: 'day = ?',
       whereArgs: [day],
@@ -44,12 +42,11 @@ class RecipeRepositoryImpl implements RecipeRepository {
     required String preparation,
     required String origin,
   }) async {
-    final db = await _db.database;
-    final maxRow = await db.rawQuery(
+    final maxRow = await _db.rawQuery(
       'SELECT COALESCE(MAX(order_index), -1) AS m FROM recipes',
     );
     final nextOrder = (maxRow.first['m'] as int) + 1;
-    final id = await db.insert('recipes', {
+    final id = await _db.insertRow('recipes', {
       'day': day,
       'meal': meal,
       'name': name,
@@ -79,8 +76,7 @@ class RecipeRepositoryImpl implements RecipeRepository {
 
   @override
   Future<void> update(Recipe recipe) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.updateWhere(
       'recipes',
       {
         'name': recipe.name,
@@ -88,8 +84,8 @@ class RecipeRepositoryImpl implements RecipeRepository {
         'preparation': recipe.preparation,
         'origin': recipe.origin,
       },
-      where: 'id = ?',
-      whereArgs: [recipe.id],
+      'id = ?',
+      [recipe.id],
     );
     final remote = _remote;
     final remoteId = recipe.remoteId;
@@ -100,15 +96,13 @@ class RecipeRepositoryImpl implements RecipeRepository {
 
   @override
   Future<void> delete(int id) async {
-    final db = await _db.database;
-    final row = await db.query(
+    final row = await _db.queryAll(
       'recipes',
-      columns: ['remote_id'],
+      columns: const ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
-    await db.delete('recipes', where: 'id = ?', whereArgs: [id]);
+    await _db.deleteWhere('recipes', 'id = ?', [id]);
     final remote = _remote;
     final remoteId =
         row.isNotEmpty ? row.first['remote_id'] as String? : null;

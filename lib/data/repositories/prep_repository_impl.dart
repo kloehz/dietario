@@ -18,8 +18,7 @@ class PrepRepositoryImpl implements PrepRepository {
 
   @override
   Future<List<PrepTask>> getAll() async {
-    final db = await _db.database;
-    final rows = await db.query('prep_tasks', orderBy: 'order_index ASC');
+    final rows = await _db.queryAll('prep_tasks', orderBy: 'order_index ASC');
     return rows.map(PrepTaskMapper.fromMap).toList();
   }
 
@@ -31,14 +30,13 @@ class PrepRepositoryImpl implements PrepRepository {
     required String purpose,
     required String storage,
   }) async {
-    final db = await _db.database;
-    final maxRow = await db.rawQuery(
+    final maxRow = await _db.rawQuery(
       'SELECT COALESCE(MAX(order_index), 0) AS m FROM prep_tasks',
     );
     var nextOrder = order;
     final storedMax = (maxRow.first['m'] as int);
     if (nextOrder <= storedMax) nextOrder = storedMax + 1;
-    final id = await db.insert('prep_tasks', {
+    final id = await _db.insertRow('prep_tasks', {
       'order_index': nextOrder,
       'task': task,
       'quantity': quantity,
@@ -66,18 +64,16 @@ class PrepRepositoryImpl implements PrepRepository {
 
   @override
   Future<void> updateStatus(int id, PrepStatus status) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.updateWhere(
       'prep_tasks',
       {'status': status.name},
-      where: 'id = ?',
-      whereArgs: [id],
+      'id = ?',
+      [id],
     );
-    final row = await db.query(
+    final row = await _db.queryAll(
       'prep_tasks',
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
     if (row.isNotEmpty) {
       final remote = _remote;
@@ -91,15 +87,13 @@ class PrepRepositoryImpl implements PrepRepository {
 
   @override
   Future<void> delete(int id) async {
-    final db = await _db.database;
-    final row = await db.query(
+    final row = await _db.queryAll(
       'prep_tasks',
-      columns: ['remote_id'],
+      columns: const ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
-    await db.delete('prep_tasks', where: 'id = ?', whereArgs: [id]);
+    await _db.deleteWhere('prep_tasks', 'id = ?', [id]);
     final remote = _remote;
     final remoteId =
         row.isNotEmpty ? row.first['remote_id'] as String? : null;

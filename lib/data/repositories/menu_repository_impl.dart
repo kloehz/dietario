@@ -18,15 +18,13 @@ class MenuRepositoryImpl implements MenuRepository {
 
   @override
   Future<List<DayMeal>> getAll() async {
-    final db = await _db.database;
-    final rows = await db.query('day_meals', orderBy: 'order_index ASC');
+    final rows = await _db.queryAll('day_meals', orderBy: 'order_index ASC');
     return rows.map(DayMealMapper.fromMap).toList();
   }
 
   @override
   Future<List<DayMeal>> getByDay(String day) async {
-    final db = await _db.database;
-    final rows = await db.query(
+    final rows = await _db.queryAll(
       'day_meals',
       where: 'day = ?',
       whereArgs: [day],
@@ -43,12 +41,11 @@ class MenuRepositoryImpl implements MenuRepository {
     String? menuCode,
     String? note,
   }) async {
-    final db = await _db.database;
-    final maxRow = await db.rawQuery(
+    final maxRow = await _db.rawQuery(
       'SELECT COALESCE(MAX(order_index), -1) AS m FROM day_meals',
     );
     final nextOrder = (maxRow.first['m'] as int) + 1;
-    final id = await db.insert('day_meals', {
+    final id = await _db.insertRow('day_meals', {
       'day': day,
       'slot': slot.name,
       'text': text,
@@ -76,16 +73,15 @@ class MenuRepositoryImpl implements MenuRepository {
 
   @override
   Future<void> update(DayMeal meal) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.updateWhere(
       'day_meals',
       {
         'text': meal.text,
         'menu_code': meal.menuCode,
         'note': meal.note,
       },
-      where: 'id = ?',
-      whereArgs: [meal.id],
+      'id = ?',
+      [meal.id],
     );
     final remote = _remote;
     final remoteId = meal.remoteId;
@@ -96,15 +92,13 @@ class MenuRepositoryImpl implements MenuRepository {
 
   @override
   Future<void> delete(int id) async {
-    final db = await _db.database;
-    final row = await db.query(
+    final row = await _db.queryAll(
       'day_meals',
       columns: ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
-    await db.delete('day_meals', where: 'id = ?', whereArgs: [id]);
+    await _db.deleteWhere('day_meals', 'id = ?', [id]);
     final remote = _remote;
     final remoteId =
         row.isNotEmpty ? row.first['remote_id'] as String? : null;
@@ -112,8 +106,6 @@ class MenuRepositoryImpl implements MenuRepository {
       await remote.deleteMeal(remoteId);
     }
   }
-
-  // ---- Sync (called by SyncCoordinator) ----
 
   Future<void> syncPull() async {
     final remote = _remote;

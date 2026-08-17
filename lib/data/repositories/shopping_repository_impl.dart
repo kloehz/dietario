@@ -18,11 +18,8 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
 
   @override
   Future<List<ShoppingItem>> getAll() async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'shopping_items',
-      orderBy: 'order_index ASC',
-    );
+    final rows =
+        await _db.queryAll('shopping_items', orderBy: 'order_index ASC');
     return rows.map(ShoppingItemMapper.fromMap).toList();
   }
 
@@ -34,12 +31,11 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
     required String unit,
     required String notes,
   }) async {
-    final db = await _db.database;
-    final maxRow = await db.rawQuery(
+    final maxRow = await _db.rawQuery(
       'SELECT COALESCE(MAX(order_index), -1) AS m FROM shopping_items',
     );
     final nextOrder = (maxRow.first['m'] as int) + 1;
-    final id = await db.insert('shopping_items', {
+    final id = await _db.insertRow('shopping_items', {
       'category': category,
       'product': product,
       'quantity': quantity,
@@ -69,33 +65,39 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
 
   @override
   Future<void> updateStatus(int id, ShoppingStatus status) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.updateWhere(
       'shopping_items',
       {'status': status.name},
-      where: 'id = ?',
-      whereArgs: [id],
+      'id = ?',
+      [id],
     );
-    final row = await db.query(
+    final row = await _db.queryAll(
       'shopping_items',
+      columns: const ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
     if (row.isNotEmpty) {
       final remote = _remote;
       final remoteId = row.first['remote_id'] as String?;
       if (remote != null && remoteId != null) {
-        final updated = ShoppingItemMapper.fromMap(row.first);
-        await remote.updateShopping(remoteId, updated);
+        // Re-fetch the full row to send to remote.
+        final fullRow = await _db.queryAll(
+          'shopping_items',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        if (fullRow.isNotEmpty) {
+          final updated = ShoppingItemMapper.fromMap(fullRow.first);
+          await remote.updateShopping(remoteId, updated);
+        }
       }
     }
   }
 
   @override
   Future<void> update(ShoppingItem item) async {
-    final db = await _db.database;
-    await db.update(
+    await _db.updateWhere(
       'shopping_items',
       {
         'category': item.category,
@@ -105,8 +107,8 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
         'notes': item.notes,
         'status': item.status.name,
       },
-      where: 'id = ?',
-      whereArgs: [item.id],
+      'id = ?',
+      [item.id],
     );
     final remote = _remote;
     final remoteId = item.remoteId;
@@ -117,15 +119,13 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
 
   @override
   Future<void> delete(int id) async {
-    final db = await _db.database;
-    final row = await db.query(
+    final row = await _db.queryAll(
       'shopping_items',
-      columns: ['remote_id'],
+      columns: const ['remote_id'],
       where: 'id = ?',
       whereArgs: [id],
-      limit: 1,
     );
-    await db.delete('shopping_items', where: 'id = ?', whereArgs: [id]);
+    await _db.deleteWhere('shopping_items', 'id = ?', [id]);
     final remote = _remote;
     final remoteId =
         row.isNotEmpty ? row.first['remote_id'] as String? : null;
@@ -136,8 +136,7 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
 
   @override
   Future<int> count() async {
-    final db = await _db.database;
-    final rows = await db.rawQuery(
+    final rows = await _db.rawQuery(
       'SELECT COUNT(*) AS c FROM shopping_items',
     );
     return (rows.first['c'] as int?) ?? 0;
@@ -145,14 +144,11 @@ class ShoppingRepositoryImpl implements ShoppingRepository {
 
   @override
   Future<int> countPurchased() async {
-    final db = await _db.database;
-    final rows = await db.rawQuery(
+    final rows = await _db.rawQuery(
       "SELECT COUNT(*) AS c FROM shopping_items WHERE status = 'comprado'",
     );
     return (rows.first['c'] as int?) ?? 0;
   }
-
-  // ---- Sync ----
 
   Future<void> syncPull() async {
     final remote = _remote;
