@@ -18,12 +18,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: flutter-actions/setup-flutter@v2
         with:
           channel: stable
-          flutter-version: '3.44.6'
+          version: '3.44.6'
           cache: true
 
       - name: Install dependencies
